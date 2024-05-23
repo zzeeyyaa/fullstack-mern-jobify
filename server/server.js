@@ -36,6 +36,34 @@ app.get("/api/v1/jobs/:id", (req, res) => {
   }
   res.status(200).json({ message: "success", data: job });
 });
+//EDIT JOB BY ID
+app.patch("/api/v1/jobs/:id", (req, res) => {
+  const { company, position } = req.body;
+  if (!company || !position) {
+    return res
+      .status(400)
+      .json({ message: "Please provide company and position" });
+  }
+  const { id } = req.params;
+  const job = jobs.find((job) => job.id === id);
+  if (!job) {
+    return res.status(404).json({ message: "Data not found" });
+  }
+  job.company = company;
+  job.posistion = position;
+  res.status(200).json({ message: "success", data: job });
+});
+//DELETE JOB BY ID
+app.delete("/api/v1/jobs/:id", (req, res) => {
+  const { id } = req.params;
+  const job = jobs.find((job) => job.id === id);
+  if (!job) {
+    return res.status(404).json({ message: "Data not found" });
+  }
+  const newJobs = jobs.filter((job) => job.id !== id);
+  jobs = newJobs;
+  res.status(200).json({ message: "success", data: job });
+});
 //CREATE JOB
 app.post("/api/v1/jobs", (req, res) => {
   const { company, position } = req.body;
@@ -50,6 +78,15 @@ app.post("/api/v1/jobs", (req, res) => {
   return res.status(201).json({ message: "Success create data", job });
 });
 
+//*MIDDLEWARE
+app.use("*", (req, res) => {
+  res.status(404).json({ message: "Not found" });
+}); //any method
+//for handling error
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500).json({ message: "Something went wrong" });
+});
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server started on port : ${port}`);
