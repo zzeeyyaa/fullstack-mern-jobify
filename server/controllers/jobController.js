@@ -8,7 +8,7 @@ let jobs = [
 ];
 
 export const getAllJobs = async (req, res) => {
-  console.log(req);
+  console.log(req.user);
   const jobs = await Job.find({});
   res.status(StatusCodes.OK).json({ message: "success", data: jobs });
 };
@@ -27,8 +27,9 @@ export const deleteJob = async (req, res) => {
   res.status(StatusCodes.OK).json({ message: "success", data: job });
 };
 export const createJob = async (req, res) => {
-  const { company, position } = req.body;
-  const job = await Job.create({ company, position });
+  req.body.createdBy = req.user.userId;
+  // const { company, position } = req.body;
+  const job = await Job.create(req.body);
   return res
     .status(StatusCodes.CREATED)
     .json({ message: "Success create data", job });
