@@ -1,4 +1,7 @@
-import { UnauthenticatedError } from "../errors/customErrors.js";
+import {
+  UnauthenticatedError,
+  UnauthorizedError,
+} from "../errors/customErrors.js";
 import { verifyJWT } from "../utils/tokenUtils.js";
 
 export const authenticateUser = (req, res, next) => {
@@ -15,3 +18,13 @@ export const authenticateUser = (req, res, next) => {
 
 ///if we invoke next, then essentiali to next middleware
 ///if not so stuck
+
+export const authorizedPermission = (...roles) => {
+  return (req, res, next) => {
+    console.log(roles);
+    if (!roles.includes(req.user.role)) {
+      throw new UnauthorizedError("unauthorized to access this route");
+    }
+    next();
+  };
+};

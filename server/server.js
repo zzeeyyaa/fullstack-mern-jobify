@@ -28,6 +28,10 @@ app.get("/", (req, res) => {
   res.send("hello");
 });
 
+app.get("/api/v1/test", (req, res) => {
+  res.json({ message: "test route" });
+});
+
 app.use("/api/v1/jobs", authenticateUser, jobRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", authenticateUser, userRouter);

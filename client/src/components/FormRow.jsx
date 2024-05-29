@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const FormRow = ({ type, name, labelText, defaultValue }) => {
+const FormRow = ({ type, name, labelText = "", defaultValue = "" }) => {
   return (
     <div className="form-row">
       <label htmlFor={name} className="form-label">
@@ -23,11 +23,6 @@ FormRow.propTypes = {
   name: PropTypes.string.isRequired,
   labelText: PropTypes.string,
   defaultValue: PropTypes.string,
-};
-
-FormRow.defaultProps = {
-  labelText: "",
-  defaultValue: "",
 };
 
 export default FormRow;
