@@ -1,4 +1,10 @@
-import { Link, Form, useNavigation, redirect } from "react-router-dom";
+import {
+  Link,
+  Form,
+  useNavigation,
+  redirect,
+  useActionData,
+} from "react-router-dom";
 import Wrapper from "../assets/wrappers/RegisterAndLoginPage";
 import Logo from "../components/Logo";
 import FormRow from "../components/FormRow";
@@ -23,11 +29,14 @@ export const action = async ({ request }) => {
 const Login = () => {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const errors = useActionData();
   return (
     <Wrapper>
       <Form method="post" className="form">
         <Logo />
         <h4>Login</h4>
+        {errors?.message && <p style={{ color: "red" }}>{errors.message}</p>}
+        <p></p>
         <FormRow type="text" name="email"></FormRow>
         <FormRow type="password" name="password"></FormRow>
         <button type="submit" className="btn btn-block" disabled={isSubmitting}>
