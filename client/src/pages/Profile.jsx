@@ -13,11 +13,15 @@ export const action = async ({ request }) => {
     return null;
   }
   try {
-    await customFetch.patch("http://localhost:5173/api/v1/user/update-user");
+    await customFetch.patch(
+      "http://localhost:5173/api/v1/user/update-user",
+      formData
+    );
     toast.success("Profile update successfully");
   } catch (error) {
     toast.error(error?.response?.data?.message);
   }
+  return null;
 };
 
 const Profile = () => {
@@ -27,7 +31,7 @@ const Profile = () => {
   const isSubmitting = navigation.state === "submitting";
   return (
     <Wrapper>
-      <Form method="post" className="form">
+      <Form method="post" className="form" encType="multipart/form-data">
         <h4 className="form-title">profile</h4>
         <div className="form-center">
           <div className="form-row">
