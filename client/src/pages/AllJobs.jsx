@@ -4,16 +4,18 @@ import customFetch from "../utils/customFetch";
 import { useLoaderData } from "react-router-dom";
 import { useContext, createContext } from "react";
 
-export const loader = async () => {
+export const loader = async ({ request }) => {
+  console.log(request.url);
+  const params = Object.fromEntries([
+    ...new URL(request.url).searchParams.entries(),
+  ]);
+  console.log(params);
   try {
-    const response = await customFetch.get("http://localhost:5173/api/v1/jobs");
-    // const data = response.data;
-    // if (typeof data === "object" && data !== null) {
-    //   return data;
-    // } else {
-    //   throw new Error("Invalid content type");
-    // }
-    return response;
+    const { data } = await customFetch.get(
+      "http://localhost:5173/api/v1/jobs",
+      { params }
+    );
+    return { data };
   } catch (error) {
     toast.error(error?.response?.data?.msg || "Error fetching jobs");
     throw error;
