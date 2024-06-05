@@ -1,14 +1,12 @@
 import PropTypes from "prop-types";
 import Wrapper from "../assets/wrappers/StatItem";
 
-const StatItem = ({ count, title, icon: Icon, color, bcg }) => {
+const StatItem = ({ count, title, icon, color, bcg }) => {
   return (
     <Wrapper color={color} bcg={bcg}>
       <header>
         <span className="count">{count}</span>
-        <span className="icon">
-          <Icon />
-        </span>
+        <span className="icon">{icon}</span>
       </header>
       <h5 className="title">{title}</h5>
     </Wrapper>
@@ -16,7 +14,7 @@ const StatItem = ({ count, title, icon: Icon, color, bcg }) => {
 };
 
 StatItem.propTypes = {
-  icon: PropTypes.elementType.isRequired, // Menggunakan PropTypes.elementType untuk komponen ikon
+  icon: PropTypes.object.isRequired, // Menggunakan PropTypes.elementType untuk komponen ikon
   count: PropTypes.number.isRequired, // Menjadikan count sebagai required dengan tipe number
   title: PropTypes.string.isRequired, // Menjadikan title sebagai required dengan tipe string
   color: PropTypes.string, // Membiarkan color sebagai string opsional
