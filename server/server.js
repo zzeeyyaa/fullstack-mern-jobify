@@ -4,6 +4,7 @@ import morgan from "morgan";
 import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+import cloudinary from "cloudinary";
 
 //router
 import jobRouter from "./routes/jobRouter.js";
@@ -24,6 +25,12 @@ const app = express();
 app.use(cookieParser());
 app.use(express.json());
 dotenv.config();
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUD_API_KEY,
+  api_secret: process.env.CLOUD_API_SECRET,
+});
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use(express.static(path.resolve(__dirname, "../client/public")));
