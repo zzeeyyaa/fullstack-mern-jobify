@@ -59,22 +59,6 @@ export const getAllJobs = async (req, res) => {
   res
     .status(StatusCodes.OK)
     .json({ totalJobs, numOfPages, currentPage: page, jobs });
-
-  // const page = NUmber(req.query.page) || 1;
-  // const limit = NUmber(req.query.limit) || 10;
-  // const skip = (page - 1) * limit;
-
-  // const jobs = await Job.find(queryObject)
-  //   .sort(sortKey)
-  //   .skip(skip)
-  //   .limit(limit);
-
-  // const totalJobs = await Job.countDocuments(queryObject);
-  // const numOfPages = Math.ceil(totalJobs / limit);
-
-  // req
-  //   .status(StatusCodes.OK)
-  //   .json({ totalJobs, numOfPages, currentPage: page, jobs });
 };
 export const getJob = async (req, res) => {
   const job = await Job.findById(req.params.id);
