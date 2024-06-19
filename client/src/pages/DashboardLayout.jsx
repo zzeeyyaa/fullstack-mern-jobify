@@ -1,18 +1,24 @@
-import { Outlet, redirect, useLoaderData, useNavigate } from "react-router-dom";
+import { Outlet, redirect, useNavigate, useNavigation } from "react-router-dom";
+import PropTypes from "prop-types";
 import Wrapper from "../assets/wrappers/Dashboard";
-import { BigSidebar, Navbar, SmallSidebar } from "../components";
-import { createContext, useContext, useState } from "react";
+import { BigSidebar, Navbar, SmallSidebar, Loading } from "../components";
+import { createContext, useContext, useState, useEffect } from "react";
 import { checkDefaultTheme } from "../App";
 import customFetch from "../utils/customFetch";
 import { toast } from "react-toastify";
+import { QueryClient, useQuery } from "@tanstack/react-query";
 
-export const loader = async () => {
-  //get data before component even render
-  try {
-    const { data } = await customFetch.get(
-      "http://localhost:5173/api/v1/user/current-user"
-    );
+const userQuery = {
+  queryKey: ["user"],
+  queryFn: async () => {
+    const { data } = await customFetch.get("/user/current-user");
     return data;
+  },
+};
+
+export const loader = (queryClient) => async () => {
+  try {
+    return await queryClient.ensureQueryData(userQuery);
   } catch (error) {
     return redirect("/");
   }
@@ -20,12 +26,15 @@ export const loader = async () => {
 
 const DashboardContext = createContext();
 
-const DashboardLayout = () => {
-  const { user } = useLoaderData();
+const DashboardLayout = ({ queryClient }) => {
+  const { user } = useQuery(userQuery).data;
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isPageLoading = navigation.state === "loading";
 
   const [showSidebar, setShowSidebar] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(checkDefaultTheme());
+  const [isAuthError, setIsAuthError] = useState(false);
 
   const toggleDarkTheme = () => {
     const newDarkTheme = !isDarkTheme;
@@ -37,12 +46,30 @@ const DashboardLayout = () => {
   const toggleSidebar = () => {
     setShowSidebar(!showSidebar);
   };
+
   const logoutUser = async () => {
-    console.log("logout user");
     navigate("/");
     await customFetch.get("/auth/logout");
+    queryClient.invalidateQueries();
     toast.success("Logging out...");
   };
+
+  customFetch.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error?.response?.status === 401 || error?.response?.status === 400) {
+        setIsAuthError(true);
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  useEffect(() => {
+    if (!isAuthError) return;
+    logoutUser();
+  }, [isAuthError]);
 
   return (
     <DashboardContext.Provider
@@ -62,13 +89,17 @@ const DashboardLayout = () => {
           <div>
             <Navbar />
             <div className="dashboard-page">
-              <Outlet context={{ user }} />
+              {isPageLoading ? <Loading /> : <Outlet context={{ user }} />}
             </div>
           </div>
         </main>
       </Wrapper>
     </DashboardContext.Provider>
   );
+};
+
+DashboardLayout.propTypes = {
+  queryClient: PropTypes.instanceOf(QueryClient).isRequired,
 };
 
 export const useDashboardContext = () => useContext(DashboardContext);

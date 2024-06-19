@@ -8,7 +8,9 @@ import { StatItem } from "../components";
 export const loader = async () => {
   try {
     const response = await customFetch.get(
-      "http://localhost:5173/api/v1/user/admin/app-stats"
+      // "http://localhost:5173/api/v1/user/admin/app-stats"
+      // "http://localhost:5000/api/v1/user/admin/app-stats"
+      "/user/admin/app-stats"
     );
     return response.data;
   } catch (error) {

@@ -4,6 +4,7 @@ import Wrapper from "../assets/wrappers/Job";
 import JobInfo from "./JobInfo";
 import day from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import PropTypes from "prop-types";
 
 day.extend(advancedFormat);
 
@@ -46,6 +47,18 @@ const Job = ({
       </div>
     </Wrapper>
   );
+};
+
+Job.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  text: PropTypes.string.isRequired,
+  _id: PropTypes.string.isRequired,
+  position: PropTypes.string.isRequired,
+  company: PropTypes.string.isRequired,
+  jobLocation: PropTypes.string.isRequired,
+  jobType: PropTypes.string.isRequired,
+  createdAt: PropTypes.string.isRequired,
+  jobStatus: PropTypes.string.isRequired,
 };
 
 export default Job;

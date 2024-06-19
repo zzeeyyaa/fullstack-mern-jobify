@@ -11,7 +11,7 @@ import { useAllJobsContext } from "../pages/AllJobs";
 function SearchContainer() {
   const { searchValues } = useAllJobsContext();
   // console.log(searchValues);
-  // const { search, jobStatus, jobType, sort } = searchValues;
+  const { search, jobStatus, jobType, sort } = searchValues;
   const submit = useSubmit();
 
   const debounce = (onChange) => {
@@ -33,7 +33,7 @@ function SearchContainer() {
           <FormRow
             type="search"
             name="search"
-            defaultValue="a"
+            defaultValue={search}
             onChange={debounce((form) => {
               submit(form);
             })}
@@ -42,7 +42,7 @@ function SearchContainer() {
             labelText="job status"
             name="jobStatus"
             list={["all", ...Object.values(JOB_STATUS)]}
-            defaultValue="all"
+            defaultValue={jobStatus}
             onChange={(e) => {
               submit(e.currentTarget.form);
             }}
@@ -51,7 +51,7 @@ function SearchContainer() {
             labelText="job type"
             name="jobType"
             list={["all", ...Object.values(JOB_TYPE)]}
-            defaultValue="all"
+            defaultValue={jobType}
             onChange={(e) => {
               submit(e.currentTarget.form);
             }}
@@ -60,7 +60,7 @@ function SearchContainer() {
             labelText="sort"
             name="newest"
             list={[...Object.values(JOB_SORT_BY)]}
-            defaultValue="all"
+            defaultValue={sort}
             onChange={(e) => {
               submit(e.currentTarget.form);
             }}
