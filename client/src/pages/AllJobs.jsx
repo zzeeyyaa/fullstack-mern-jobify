@@ -15,7 +15,7 @@ export const loader = async ({ request }) => {
       "http://localhost:5173/api/v1/jobs",
       { params }
     );
-    return { data };
+    return { data, searchValues: { ...params } };
   } catch (error) {
     toast.error(error?.response?.data?.msg || "Error fetching jobs");
     throw error;
@@ -24,13 +24,14 @@ export const loader = async ({ request }) => {
 const AllJobsContext = createContext();
 
 const AllJobs = () => {
-  const { data } = useLoaderData();
+  const { data, searchValues } = useLoaderData();
   console.log(data);
   return (
     <>
       <AllJobsContext.Provider
         value={{
           data,
+          searchValues,
         }}
       >
         <SearchContainer />

@@ -10,22 +10,41 @@ import { useAllJobsContext } from "../pages/AllJobs";
 
 function SearchContainer() {
   const { searchValues } = useAllJobsContext();
+  // console.log(searchValues);
   // const { search, jobStatus, jobType, sort } = searchValues;
-  // const submit = useSubmit();
+  const submit = useSubmit();
+
+  const debounce = (onChange) => {
+    let timeout;
+    return (e) => {
+      const form = e.currentTarget.form;
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        onChange(form);
+      }, 2000);
+    };
+  };
 
   return (
     <Wrapper>
       <Form className="form">
         <h5 className="form-title">search form</h5>
         <div className="form-center">
-          <FormRow type="search" name="search"></FormRow>
+          <FormRow
+            type="search"
+            name="search"
+            defaultValue="a"
+            onChange={debounce((form) => {
+              submit(form);
+            })}
+          ></FormRow>
           <FormRowSelect
             labelText="job status"
             name="jobStatus"
             list={["all", ...Object.values(JOB_STATUS)]}
             defaultValue="all"
             onChange={(e) => {
-              SubmitEvent(e.currentTarget.form);
+              submit(e.currentTarget.form);
             }}
           />
           <FormRowSelect
@@ -34,7 +53,7 @@ function SearchContainer() {
             list={["all", ...Object.values(JOB_TYPE)]}
             defaultValue="all"
             onChange={(e) => {
-              SubmitEvent(e.currentTarget.form);
+              submit(e.currentTarget.form);
             }}
           />
           <FormRowSelect
@@ -43,13 +62,13 @@ function SearchContainer() {
             list={[...Object.values(JOB_SORT_BY)]}
             defaultValue="all"
             onChange={(e) => {
-              SubmitEvent(e.currentTarget.form);
+              submit(e.currentTarget.form);
             }}
           />
           <Link to="/dashboard/all-jobs" className="btn form-btn delete-btn">
             Reset Search Values
           </Link>
-          <SubmitBtn formBtn />
+          {/* <SubmitBtn formBtn /> */}
         </div>
       </Form>
     </Wrapper>
