@@ -1,44 +1,66 @@
-import { Form, redirect, useLoaderData, useParams } from "react-router-dom";
+import { Form, redirect, useLoaderData } from "react-router-dom";
 import { FormRow, FormRowSelect, SubmitBtn } from "../components";
 import Wrapper from "../assets/wrappers/DashboardFormPage";
 import { JOB_STATUS, JOB_TYPE } from "../../../server/utils/constants";
 import customFetch from "../utils/customFetch";
 import { toast } from "react-toastify";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
-export const loader = async ({ params }) => {
-  try {
-    const { data } = await customFetch.get(
-      `http://localhost:5173/api/v1/jobs/${params.id}`
-    );
-    console.log(data);
-    return data;
-  } catch (error) {
-    toast.error(error?.response?.data?.message);
-    return redirect("/dashboard/all-jobs");
-  }
+const singleJobQuery = (id) => {
+  return {
+    queryKey: ["job", id],
+    queryFn: async () => {
+      const { data } = await customFetch.get(`/jobs/${id}`);
+      console.log(data);
+      return data;
+    },
+  };
 };
 
-export const action = async ({ request, params }) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-  try {
-    await customFetch.patch(
-      `http://localhost:5173/api/v1/jobs/${params.id}`,
-      data
-    );
-    toast.success("Job edited successfully");
-    return redirect("/dashboard/all-jobs");
-  } catch (error) {
-    TransformStream.error(error?.response?.data?.message);
-    return error;
-  }
-};
+export const loader =
+  (queryClient) =>
+  async ({ params }) => {
+    try {
+      await queryClient.ensureQueryData(singleJobQuery(params.id));
+      return params.id;
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+      return redirect("/dashboard/all-jobs");
+    }
+  };
+
+export const action =
+  (queryClient) =>
+  async ({ request, params }) => {
+    const formData = await request.formData();
+    const data = Object.fromEntries(formData);
+    try {
+      await customFetch.patch(`/jobs/${params.id}`, data);
+      queryClient.invalidateQueries(["jobs"]);
+
+      toast.success("Job edited successfully");
+      return redirect("/dashboard/all-jobs");
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message;
+      if (errorMessage === "Demo User. Read Only!") {
+        toast.error("Job edit failed: Demo User. Read Only!");
+      } else {
+        toast.error(errorMessage);
+      }
+      return redirect("/dashboard/all-jobs");
+      // TransformStream.error(error?.response?.data?.message);
+      // return error;
+    }
+  };
 
 const EditJob = () => {
-  const { job } = useLoaderData();
-  const params = useParams();
-  console.log(params);
+  // const { job } = useLoaderData();
+  // const params = useParams();
+  // console.log(params);
+  const id = useLoaderData();
+  const {
+    data: { job },
+  } = useQuery(singleJobQuery(id));
   return (
     <Wrapper>
       <Form method="post" className="form">
@@ -57,6 +79,7 @@ const EditJob = () => {
             name="jobStatus"
             labelText="job status"
             list={Object.values(JOB_STATUS)}
+            defaultValue={job.jobStatus}
           />
           <FormRowSelect
             type="text"
