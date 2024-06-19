@@ -5,6 +5,9 @@ import * as dotenv from "dotenv";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
+import cors from "cors";
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
 
 //router
 import jobRouter from "./routes/jobRouter.js";
@@ -24,6 +27,8 @@ import { authenticateUser } from "./middleware/authMiddleware.js";
 const app = express();
 app.use(cookieParser());
 app.use(express.json());
+app.use(helmet());
+app.use(mongoSanitize());
 dotenv.config();
 
 cloudinary.config({
@@ -33,23 +38,28 @@ cloudinary.config({
 });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-app.use(express.static(path.resolve(__dirname, "../client/public")));
+app.use(express.static(path.resolve(__dirname, "../client/dist")));
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
-app.get("/", (req, res) => {
-  res.send("hello");
-});
+// Middleware CORS
+const corsOptions = {
+  origin: "http://localhost:5173",
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
 
-app.get("/api/v1/test", (req, res) => {
-  res.json({ message: "test route" });
-});
+app.use(cors(corsOptions));
 
 app.use("/api/v1/jobs", authenticateUser, jobRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", authenticateUser, userRouter);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
+});
 
 //*MIDDLEWARE
 app.use("*", (req, res) => {
